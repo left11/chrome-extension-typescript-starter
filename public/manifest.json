@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "可达鸭-无限免费的达人私信邀约插件",
-  "description": "可达鸭,让达人邀约不再困难",
+  "name": "可达鸭-Tiktok无限免费的达人私信邀约插件",
+  "description": "可达鸭,让tiktok达人邀约不再困难",
   "version": "1.0",
   "options_ui": {
     "page": "options.html"

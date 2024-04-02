@@ -1,6 +1,1 @@
-function polling() {
-  // console.log("polling");
-  setTimeout(polling, 1000 * 30);
-}
-
-polling();
+// 应该把插件的服务器端请求封装在这边，暂时没写
