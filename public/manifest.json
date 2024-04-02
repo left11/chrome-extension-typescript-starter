@@ -1,35 +1,66 @@
 {
   "manifest_version": 3,
-
-  "name": "Chrome Extension TypeScript Starter",
-  "description": "Chrome Extension, TypeScript, Visual Studio Code",
+  "name": "可达鸭-无限免费的达人私信邀约插件",
+  "description": "可达鸭,让达人邀约不再困难",
   "version": "1.0",
-
   "options_ui": {
     "page": "options.html"
   },
-
   "action": {
     "default_icon": "icon.png",
     "default_popup": "popup.html"
   },
-
   "content_scripts": [
-      {
-          "matches": ["<all_urls>"],
-          "js": ["js/vendor.js", "js/content_script.js"]
-      }
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "js/vendor.js",
+        "js/content_script.js"
+      ],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "js/content_inject_script.js"
+      ],
+      "run_at": "document_end"
+    }
   ],
+
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval' http://localhost:*;  style-src 'self' 'unsafe-inline'; object-src 'self';"
+  },
 
   "background": {
     "service_worker": "js/background.js"
   },
-
   "permissions": [
-    "storage"
+    "alarms",
+    "cookies",
+    "notifications",
+    "storage",
+    "tabs",
+    "activeTab",
+    "scripting",
+    "system"
   ],
-
   "host_permissions": [
     "<all_urls>"
+  ],
+  "web_accessible_resources": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "resources": [
+        "js/injected.js"
+      ],
+      "use_dynamic_url": true
+    }
   ]
 }

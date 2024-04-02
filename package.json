@@ -17,6 +17,9 @@
     "url": "https://github.com/chibat/chrome-extension-typescript-starter.git"
   },
   "dependencies": {
+    "long": "^5.2.3",
+    "moment": "^2.30.1",
+    "querystring": "^0.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
