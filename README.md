@@ -1,5 +1,7 @@
 # Chrome Extension TypeScript Starter
 
+达人自动私信建联插件 v0.0.1
+
 ![build](https://github.com/chibat/chrome-extension-typescript-starter/workflows/build/badge.svg)
 
 Chrome Extension, TypeScript and Visual Studio Code
