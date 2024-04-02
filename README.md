@@ -68,3 +68,23 @@ Load `dist` directory
 
 ## Test
 `npx jest` or `npm run test`
+
+## 代码结构说明
+
+1. injected.ts 
+
+重载达人查找页面的XMLHttpRequest对象用于拦截网页端的tiktok请求（主要是为了获取token)
+给window注入一个发送http的方法 sendHttpRequest
+
+2. background.ts
+
+服务端等其他请求可放在此处（暂时没做）
+
+3. content_inject_script.ts
+
+注入界面App
+
+4. content_script.ts
+
+注入injected.ts, 同时拦截injected.ts发送过来的message, 保存后续请求要用的token
+

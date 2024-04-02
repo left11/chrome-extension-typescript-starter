@@ -15,29 +15,46 @@ class TKAPI {
     private baseUrl: string;
     private tokenInfo: any;
     private sequenceId: any = 1e9;
+    public creatorQuery:string = "";
+    public nextPagination:string = "";
 
     constructor(baseUrl: string = BASE_URL) {
         this.baseUrl = baseUrl;
     }
 
-    async getTiktokProtoDecode(data:any, type = "tiktok.Response") {
+    async getUserCreatorCache() {
+        let items = await chrome.storage.local.get("userCreatorList");
+        return items["userCreatorList"];
+    }
+
+    async setUserCreatorCache(data: any) {
+        await chrome.storage.local.set({"userCreatorList": data});
+    }
+
+    async getTiktokProtoDecode(data: any, type = "tiktok.Response") {
         return await this.post("/invitation/proto/decode", {data: data, type: type})
     }
 
-    async getTiktokProtoEncode(data:any, type="tiktok.Request") {
+    async getTiktokProtoEncode(data: any, type = "tiktok.Request") {
         return await this.post("/invitation/proto/encode", {data: data, type: type})
     }
 
-    async post(url:string, data:any) {
+    async post(url: string, data: any) {
         return await this.auth("post", "https://tool.kollink.net/web" + url, data)
     }
 
-    async auth(method:string, url:string, data:any) {
-        // TODO get token here
-        const ret = await this.hackLogin();
-        console.log(`ret.....`, ret)
-        // @ts-ignore
-        const token = ret.data.user.token;
+    async auth(method: string, url: string, data: any) {
+        let token;
+        const DL_TOKEN = await chrome.storage.local.get("DL_TOKEN");
+        if (DL_TOKEN && DL_TOKEN["DL_TOKEN"]) {
+            token = DL_TOKEN["DL_TOKEN"];
+        } else {
+            const ret = await this.hackLogin();
+            console.log(`模拟登录达链拿登录token.....`, ret)
+            // @ts-ignore
+            token = ret.data.user.token;
+            await chrome.storage.local.set({'DL_TOKEN': token})
+        }
         // const r = await chrome.storage.local.get("DL-USER")
         // const token = r["DL-USER"].token;
         // console.log(r);
@@ -46,15 +63,21 @@ class TKAPI {
     }
 
     async hackLogin() {
-        return await this.send("post", "https://tool.kollink.net/web/login", {mobile: "13810295336", password: "27c6cd9f622cb9b820a6de5039014cd7", sellerId: "8647392017145235247", code:"",companyId:""},   {"Content-Type": "application/json;charset=utf-8"})
+        return await this.send("post", "https://tool.kollink.net/web/login", {
+            mobile: "13810295336",
+            password: "27c6cd9f622cb9b820a6de5039014cd7",
+            sellerId: "8647392017145235247",
+            code: "",
+            companyId: ""
+        }, {"Content-Type": "application/json;charset=utf-8"})
     }
 
-    async send(method:string, url:string, data:any, headers:any) {
+    async send(method: string, url: string, data: any, headers: any) {
         console.log(`headers....`, headers)
-        let init:any;
-        if(headers) {
+        let init: any;
+        if (headers) {
             init = {method: method, body: JSON.stringify(data), headers: headers}
-        }else{
+        } else {
             init = {method: method, body: JSON.stringify(data)}
         }
         return new Promise((resolve, reject) => {
@@ -68,7 +91,6 @@ class TKAPI {
                 });
         });
     }
-
 
 
     // @ts-ignore
@@ -340,7 +362,7 @@ class TKAPI {
         }
     };
 
-    baseMessageTemplate(txt:string) {
+    baseMessageTemplate(txt: string) {
         return {
             intentional_cooperation: [1],
             provided_free_sample: !1,
@@ -360,10 +382,10 @@ class TKAPI {
      * @param receiver 拦截请求获取到的creator的详细信息
      * @param msg 消息模板
      */
-    async sendIndividualMessage(receiver:any, msg:string) {
+    async sendIndividualMessage(receiver: any, msg: string) {
         // 获取token信息
         const tokenInfo = await this.fetchWebSocketTokenInfo(null);
-        if(!tokenInfo) {
+        if (!tokenInfo) {
             console.log(`获取token信息失败...`)
             return null;
         }
@@ -392,7 +414,11 @@ class TKAPI {
         }
 
         // @ts-ignore
-        const message = this.createMessage(form, {tokenInfo: tokenInfo, conversationId: conversationIdResp.response.data.conversation_id});
+        const message = this.createMessage(form, {
+            tokenInfo: tokenInfo,
+            // @ts-ignore
+            conversationId: conversationIdResp.response.data.conversation_id
+        });
         console.log(`message....`, message)
         const encodeData = await this.getTiktokProtoEncode(message, "tiktok.Request");
         // @ts-ignore
@@ -400,13 +426,8 @@ class TKAPI {
 
         // @ts-ignore
         const ret = await this.imSendMessage(tokenInfo.api_url, encodeData.data);
-        console.log(ret)
-
-        // 发送消息
-        // const messageResponse = await this.imSendMessage(this.tokenInfo.api_url, items[0].body);
-        // console.log(`messageResponse....`, messageResponse)
-        //
-        // return messageResponse;
+        // @ts-ignore
+        console.log(`send message response....`, ret)
 
     }
 

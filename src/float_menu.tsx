@@ -18,9 +18,35 @@ function injectButton() {
         button.style.padding = '10px 20px';
         button.style.cursor = 'pointer';
         button.onclick = () => {
-            alert('请选择要自动私信的用户，或者全部选择!');
-            tkApi.sendIndividualMessage({'creator_oecuid': {is_authed: true, status: 0, value: "7494051048330202421"} }, 'Hellooo, I\'m not sure if you\'re interested in our products, but I wanted to inquire if there is any intention for collaboration.').then().catch()
-        };
+            // tkApi.sendIndividualMessage({'creator_oecuid': {is_authed: true, status: 0, value: "7494051048330202421"} }, 'Hellooo, I\'m not sure if you\'re interested in our products, but I wanted to inquire if there is any intention for collaboration.').then().catch()
+            // 找出选中的checkbox项目 <input type="checkbox" class="dlink-check-sub" name="dlink-check-group"> checkbox的class必须是 dlink-check-sub
+            const selectedCheckboxes = document.querySelectorAll('input.dlink-check-sub:checked');
+            //遍历每个选中的checkbox
+            tkApi.getUserCreatorCache().then((userCreatorList) => {
+                console.log(userCreatorList)
+                selectedCheckboxes.forEach((checkbox) => {
+                    // 获取当前行的所有单元格
+                    let p = checkbox.parentElement;
+                    let span = p!.querySelector('span.text-body-s-regular.text-neutral-text4.text-overflow-single');
+                    // @ts-ignore
+                    let nickname = span!.innerText;
+                    console.log(nickname); // logs the value of the span element, which should be "funshopstt"
+                    // 根据value找到tkApi.userCreatorList中的对应的oecuid
+
+                    const oecuid = userCreatorList.filter((item:any) => item.nickname.value === nickname)[0].creator_oecuid.value;
+                    // console.log(value, oecuid)
+
+                    // 发送私信
+                    console.log(`开始给${nickname}发送私信`)
+                    let intervalId = setInterval(() => {
+                        tkApi.sendIndividualMessage({'creator_oecuid': {is_authed: true, status: 0, value: oecuid} }, `Hello ${nickname}, I'm not sure if you're interested in our products, but I wanted to inquire if there is any intention for collaboration.`)
+                            .then()
+                            .catch()
+                    }, 3000); // 3000毫秒等于3秒
+                });
+            }).catch()
+
+        }
         document.body.appendChild(button);
     }
 }
